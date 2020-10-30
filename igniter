@@ -1,0 +1,41 @@
+#include <SoftwareSerial.h>
+#include<Servo.h> //Servo 라이브러리를 추가
+Servo servo;      //Servo 클래스로 servo객체 생성
+int value = 0;    // 각도를 조절할 변수 value
+SoftwareSerial BTSerial(2, 3);   
+
+void setup() {  
+  Serial.begin(9600);
+  BTSerial.begin(9600);
+  pinMode(12, OUTPUT);
+  servo.attach(7);     //맴버함수인 attach : 핀 설정
+  servo.write(0);     //초기 각도를 0도로 설정
+}
+
+void loop() {
+  if (BTSerial.available()){
+    char data = BTSerial.read();
+    Serial.write(data);
+    
+    if(data == '0'){
+      servo.write(30);            //각도를 30도 증가시킨다.
+      delay(1000);
+      digitalWrite(12, HIGH);     //MOSFET 작동 - 점화기 작동
+      delay(150);
+      digitalWrite(12, LOW);
+      delay(1000);
+      servo.write(0);           
+      
+      
+    }else if(data == '1'){
+      digitalWrite(12, LOW);
+      servo.write(0);
+    }
+ 
+  }
+    
+  if (Serial.available())
+    BTSerial.write(Serial.read());
+
+
+}
